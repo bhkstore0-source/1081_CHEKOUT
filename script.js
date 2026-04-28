@@ -135,16 +135,19 @@ function finalSubmit() {
   btn.innerText     = '⏳ جاري إرسال الطلب...';
   btn.style.opacity = '0.6';
 
-  const formData = {
-    product:        PRODUCT_NAME,
-    name,
-    phone,
-    wilaya:         wilayaSel.options[wilayaSel.selectedIndex].text,
-    commune,
-    delivery_type:  selectedDelivery === 'home' ? 'توصيل للمنزل' : 'توصيل للمكتب',
-    delivery_price: delivery > 0 ? delivery.toLocaleString() + ' دج' : 'مجانا',
-    total:          total.toLocaleString() + ' دج'
-  };
+   // ✅ FIX PRINCIPAL : FormData بدل JSON
+  // مع mode: 'no-cors'، المتصفح يرفض Content-Type: application/json
+  // FormData (multipart) هي الطريقة الوحيدة اللي تخدم
+  const formData = new FormData();
+  formData.append('product',        PRODUCT_NAME);
+  formData.append('name',           name);
+  formData.append('phone',          phone);
+  formData.append('wilaya_num',     wilayaNum);
+  formData.append('wilaya_name',    wilayaName);
+  formData.append('commune',        commune);
+  formData.append('delivery_type',  selectedDelivery === 'home' ? 'توصيل للمنزل' : 'توصيل للمكتب');
+  formData.append('delivery_price', String(delivery));  // ✅ رقم صافي بلا "دج"
+  formData.append('total',          String(total));      // ✅ رقم صافي بلا "دج"
 
   fetch(SCRIPT_URL, {
     method:  'POST',

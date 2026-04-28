@@ -3,8 +3,7 @@
 // ══════════════════════════════════════════
 
 const PRODUCT_PRICE      = 2000;
-const PRODUCT_NAME       = '
-جهاز شد الرقبة والوجه المتطور: وداعاً للترهلات والتجاعيد';
+const PRODUCT_NAME       = 'جهاز شد الرقبة و الوجه';
 const SCRIPT_URL         = 'https://script.google.com/macros/s/AKfycbxANz4iuRsmU3XwKsJhmQ1caPlFpBnLqMOrgRlIdtjjtQpuPOcuXq45sy5uEZbNCiq-WA/exec';
 const WHATSAPP_NUM       = '213553096569';
 const RESTRICTED_WILAYAS = ['52', '56', '57'];

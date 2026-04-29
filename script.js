@@ -41,16 +41,27 @@ const OFFICE_PRICES = {
 let selectedDelivery = 'home';
 let communeData      = {};
 
-fetch('communes.json')
-  .then(r => r.json())
-  .then(data => { communeData = data; });
-
 // ══════════════════════════════════════════
 function selectDelivery(type) {
   selectedDelivery = type;
   document.getElementById('homeBox').classList.toggle('active',   type === 'home');
   document.getElementById('officeBox').classList.toggle('active', type === 'office');
-  updateTotal();
+
+  // أعد تحميل البلديات حسب نوع التوصيل الجديد
+  const w = document.getElementById('wilayaSelect').value;
+  if (w) {
+    loadCommunes(type).then(() => updateTotal());
+  } else {
+    updateTotal();
+  }
+}
+
+// ══════════════════════════════════════════
+function loadCommunes(type) {
+  const file = type === 'home' ? 'communes.json' : 'communes stopdesk.json';
+  return fetch(file)
+    .then(r => r.json())
+    .then(data => { communeData = data; });
 }
 
 // ══════════════════════════════════════════
@@ -59,20 +70,26 @@ function updateCommunes() {
   const cSelect   = document.getElementById('communeSelect');
   const officeBox = document.getElementById('officeBox');
 
-  cSelect.innerHTML = '<option value="">اختر البلدية</option>';
-  (communeData[w] || []).forEach(name => {
-    const o = document.createElement('option');
-    o.value = name; o.textContent = name;
-    cSelect.appendChild(o);
-  });
-
-  if (RESTRICTED_WILAYAS.includes(w)) {
+  const isRestricted = RESTRICTED_WILAYAS.includes(w);
+  if (isRestricted) {
     officeBox.style.display = 'none';
-    selectDelivery('home');
+    selectedDelivery = 'home';
+    document.getElementById('homeBox').classList.add('active');
+    document.getElementById('officeBox').classList.remove('active');
   } else {
     officeBox.style.display = 'flex';
   }
-  updateTotal();
+
+  // حمّل الملف المناسب ثم عبّي البلديات
+  loadCommunes(selectedDelivery).then(() => {
+    cSelect.innerHTML = '<option value="">اختر البلدية</option>';
+    (communeData[w] || []).forEach(name => {
+      const o = document.createElement('option');
+      o.value = name; o.textContent = name;
+      cSelect.appendChild(o);
+    });
+    updateTotal();
+  });
 }
 
 // ══════════════════════════════════════════
@@ -141,7 +158,6 @@ function finalSubmit() {
   btn.innerText     = '⏳ جاري إرسال الطلب...';
   btn.style.opacity = '0.6';
 
-  // ✅ payload JSON نظيف
   const payload = JSON.stringify({
     product:        PRODUCT_NAME,
     name:           name,
@@ -154,13 +170,11 @@ function finalSubmit() {
     total:          String(total)
   });
 
-  // ✅ XHR مع Content-Type: text/plain — الوحيد اللي يخدم مع Apps Script + no-cors
   const xhr = new XMLHttpRequest();
   xhr.open('POST', SCRIPT_URL, true);
   xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
 
   const onSuccess = () => {
-    // Facebook Pixel
     if (typeof fbq !== 'undefined') {
       fbq('track', 'Purchase', {
         value:        total,
@@ -175,11 +189,8 @@ function finalSubmit() {
     btn.style.opacity = '1';
   };
 
-  xhr.onload = onSuccess;
-
-  // no-cors دايما يرجع error حتى إذا وصل — نعامله كنجاح
+  xhr.onload  = onSuccess;
   xhr.onerror = onSuccess;
-
   xhr.send(payload);
 }
 
@@ -194,6 +205,8 @@ function closeSuccessModal() {
 
 // ══════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  // حمّل communes.json الافتراضي (توصيل منزل)
+  loadCommunes('home');
   updateTotal();
 
   const ph = document.getElementById('phoneInput');

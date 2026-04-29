@@ -4,7 +4,7 @@
 
 const PRODUCT_PRICE      = 2000;
 const PRODUCT_NAME       = 'جهاز شد الرقبة و الوجه';
-const SCRIPT_URL         = 'https://script.google.com/macros/s/AKfycbxa9jto6Kb5NHzUZgU5dwhDpzXVVyPbSObKKXykL6W9SxWH8_PKvgOUnExBXw-6jd9irg/exec';
+const SCRIPT_URL         = 'https://script.google.com/macros/s/AKfycbx5B7mQ8WnFVfXNjc1_jUSPteAz0VDaPBiXF9Rm-o1kHojU582pGu7thchRncmR5MFtrw/exec';
 const WHATSAPP_NUM       = '213553096569';
 const RESTRICTED_WILAYAS = ['52', '56', '57'];
 
